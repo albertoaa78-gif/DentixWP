@@ -262,37 +262,50 @@ if (!empty($productos_nuevos)) : ?>
   <?php
   function dentix_render_product_cards(array $products): void {
     foreach ($products as $product) :
-      $img        = get_the_post_thumbnail_url($product->get_id(), 'dentix-product-thumb');
-      $sku        = $product->get_sku();
-      $on_sale    = $product->is_on_sale();
-      $reg_price  = $product->get_regular_price();
-      $sale_price = $product->get_sale_price();
+      $img         = get_the_post_thumbnail_url($product->get_id(), 'dentix-product-thumb');
+      $sku         = $product->get_sku();
+      $on_sale     = $product->is_on_sale();
+      $reg_price   = $product->get_regular_price();
+      $sale_price  = $product->get_sale_price();
       $brand_terms = wp_get_post_terms($product->get_id(), 'pa_marca');
-      $brand      = (!is_wp_error($brand_terms) && !empty($brand_terms)) ? $brand_terms[0]->name : '';
+      $brand       = (!is_wp_error($brand_terms) && !empty($brand_terms)) ? $brand_terms[0]->name : '';
+      $cat_terms   = wp_get_post_terms($product->get_id(), 'product_cat', ['number'=>1]);
+      $cat_name    = (!is_wp_error($cat_terms) && !empty($cat_terms)) ? $cat_terms[0]->name : '';
+      $cat_slug    = (!is_wp_error($cat_terms) && !empty($cat_terms)) ? $cat_terms[0]->slug : '';
+      $discount    = ($on_sale && $reg_price && $sale_price) ? round((($reg_price - $sale_price) / $reg_price) * 100) : 0;
   ?>
-    <a href="<?php echo esc_url(get_permalink($product->get_id())); ?>" class="prod-card prod-card-sm">
-      <div class="prod-img">
+    <a href="<?php echo esc_url(get_permalink($product->get_id())); ?>"
+       class="pcard" title="<?php echo esc_attr($product->get_name()); ?>">
+      <div class="pcard-img">
         <?php if ($img) : ?>
           <img src="<?php echo esc_url($img); ?>" alt="<?php echo esc_attr($product->get_name()); ?>" loading="lazy">
         <?php else : ?>
-          <div class="prod-circle"><svg class="prod-svg" viewBox="0 0 64 64" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><rect x="16" y="20" width="32" height="24" rx="3"/></svg></div>
+          <div class="pcard-noimg"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="12" width="32" height="24" rx="3"/><line x1="16" y1="20" x2="32" y2="20"/></svg></div>
         <?php endif; ?>
-        <button class="p-wish" onclick="event.preventDefault()">♡</button>
-        <?php if ($on_sale && $reg_price) : $disc = round((($reg_price - $sale_price) / $reg_price) * 100); ?>
-          <span class="p-badge sale">−<?php echo $disc; ?>%</span>
-        <?php endif; ?>
+        <?php if ($discount > 0) : ?><span class="pcard-discount">−<?php echo $discount; ?>%</span><?php endif; ?>
       </div>
-      <div class="prod-body">
-        <?php if ($brand) : ?><div class="p-brand"><?php echo esc_html($brand); ?></div><?php endif; ?>
-        <div class="p-name"><?php echo esc_html($product->get_name()); ?></div>
-        <?php if ($sku) : ?><div class="p-ref">REF: <?php echo esc_html($sku); ?></div><?php endif; ?>
-        <div class="p-footer">
-          <div class="p-price">
-            <span class="p-price-main"><?php echo $product->get_price_html(); ?></span>
+      <div class="pcard-body">
+        <?php if ($cat_name) : ?><span class="pcard-cat pcard-cat-<?php echo esc_attr($cat_slug); ?>"><?php echo esc_html($cat_name); ?></span><?php endif; ?>
+        <div class="pcard-name"><?php echo esc_html($product->get_name()); ?></div>
+        <div class="pcard-meta">
+          <?php if ($brand) : ?><span class="pcard-brand"><?php echo esc_html($brand); ?></span><?php endif; ?>
+          <?php if ($sku) : ?><span class="pcard-sku">REF <?php echo esc_html($sku); ?></span><?php endif; ?>
+        </div>
+        <div class="pcard-footer">
+          <div class="pcard-price">
+            <?php if ($on_sale && $sale_price) : ?>
+              <span class="pcard-price-current"><?php echo wc_price($sale_price); ?></span>
+              <span class="pcard-price-old"><?php echo wc_price($reg_price); ?></span>
+            <?php else : ?>
+              <span class="pcard-price-current"><?php echo $product->get_price_html(); ?></span>
+            <?php endif; ?>
           </div>
           <?php if ($product->is_in_stock()) : ?>
-            <button class="p-add" data-product-id="<?php echo $product->get_id(); ?>"
-              onclick="event.preventDefault();dentixAddToCart(<?php echo $product->get_id(); ?>,this)">+</button>
+            <button class="pcard-add"
+              onclick="event.preventDefault();dentixAddToCart(<?php echo $product->get_id(); ?>,this)"
+              aria-label="Añadir al carrito">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
           <?php endif; ?>
         </div>
       </div>

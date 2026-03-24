@@ -34,7 +34,7 @@ get_header();
   </div>
 
   <?php if (have_posts()) : ?>
-    <div class="prod-grid">
+    <div class="pcard-grid">
       <?php while (have_posts()) : the_post();
         $product = wc_get_product(get_the_ID());
         if (!$product) continue;
@@ -43,26 +43,31 @@ get_header();
         $brand_terms = wp_get_post_terms(get_the_ID(), 'pa_marca');
         $brand = !empty($brand_terms) && !is_wp_error($brand_terms) ? $brand_terms[0]->name : '';
       ?>
-        <a href="<?php the_permalink(); ?>" class="prod-card">
-          <div class="prod-img">
+        <?php
+        $cat_terms_s = wp_get_post_terms(get_the_ID(), 'product_cat', ['number'=>1]);
+        $cat_name_s  = (!is_wp_error($cat_terms_s) && !empty($cat_terms_s)) ? $cat_terms_s[0]->name : '';
+        $cat_slug_s  = (!is_wp_error($cat_terms_s) && !empty($cat_terms_s)) ? $cat_terms_s[0]->slug : '';
+        ?>
+        <a href="<?php the_permalink(); ?>" class="pcard">
+          <div class="pcard-img">
             <?php if ($img) : ?>
               <img src="<?php echo esc_url($img); ?>" alt="<?php the_title_attribute(); ?>" loading="lazy">
             <?php else : ?>
-              <div class="prod-circle">
-                <svg class="prod-svg" viewBox="0 0 64 64" fill="none" stroke="var(--gray-mid)" stroke-width="1.5">
-                  <rect x="16" y="20" width="32" height="24" rx="3"/>
-                </svg>
-              </div>
+              <div class="pcard-noimg"><svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="12" width="32" height="24" rx="3"/></svg></div>
             <?php endif; ?>
-            <button class="p-wish">♡</button>
           </div>
-          <div class="prod-body">
-            <?php if ($brand) echo '<div class="p-brand">' . esc_html($brand) . '</div>'; ?>
-            <div class="p-name"><?php the_title(); ?></div>
-            <?php if ($sku) echo '<div class="p-ref">REF: ' . esc_html($sku) . '</div>'; ?>
-            <div class="p-footer">
-              <div class="p-price"><span class="p-price-main"><?php echo $product->get_price_html(); ?></span></div>
-              <button class="p-add" data-product-id="<?php echo get_the_ID(); ?>">+</button>
+          <div class="pcard-body">
+            <?php if ($cat_name_s) : ?><span class="pcard-cat pcard-cat-<?php echo esc_attr($cat_slug_s); ?>"><?php echo esc_html($cat_name_s); ?></span><?php endif; ?>
+            <div class="pcard-name"><?php the_title(); ?></div>
+            <div class="pcard-meta">
+              <?php if ($brand) echo '<span class="pcard-brand">' . esc_html($brand) . '</span>'; ?>
+              <?php if ($sku) echo '<span class="pcard-sku">REF ' . esc_html($sku) . '</span>'; ?>
+            </div>
+            <div class="pcard-footer">
+              <div class="pcard-price"><span class="pcard-price-current"><?php echo $product->get_price_html(); ?></span></div>
+              <button class="pcard-add" onclick="event.preventDefault();dentixAddToCart(<?php echo get_the_ID(); ?>,this)">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              </button>
             </div>
           </div>
         </a>

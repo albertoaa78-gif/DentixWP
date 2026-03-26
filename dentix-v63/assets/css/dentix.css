@@ -25,27 +25,10 @@
    ══════════════════════════════════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-/*
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--dark-main);overflow-x:hidden;
   display:flex;flex-direction:column;min-height:100vh}
-/* El contenido principal ocupa el espacio disponible 
+/* El contenido principal ocupa el espacio disponible */
 body > *:not(footer):not(.topbar):not(header):not(nav){flex:1 0 auto}
-*/
-body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--cream);
-  color:var(--dark-main);
-  overflow-x:hidden;
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-}
-
-/* FIX LAYOUT */
-main{
-  flex:1;
-}
-
 footer{flex:0 0 auto}
 a{text-decoration:none;color:inherit}
 img{display:block;max-width:100%}
@@ -1494,7 +1477,6 @@ footer{
    que es nuestro contenedor grid directo en archive-product.php */
 .shop-grid,
 .prod-grid,
-/* Elimino para ver comportamiento*/
 ul.products,
 div.products,
 .woocommerce ul.products,
@@ -1511,23 +1493,6 @@ div.products,
   width:100% !important;
   clear:both !important;
 }
-
-
-/* ═══════════════════════════════
-   WOOCOMMERCE GRID AISLADO
-   ═══════════════════════════════ */
-
-/* SOLO SHOP Y CATEGORÍAS 
-body.post-type-archive-product ul.products,
-body.tax-product_cat ul.products {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  list-style: none;
-  padding: 0;
-}
-*/
-
 /* Con sidebar: 3 columnas */
 .shop-main ul.products,
 .shop-main div.products,
